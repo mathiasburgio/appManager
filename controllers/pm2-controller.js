@@ -1,7 +1,7 @@
 const utils = require("../utils/utils");
 
 async function _getAll(){
-    let data = await utils.exec(`pm2 list --json`);
+    let data = await utils.exec(`pm2 jlist`);
     return data;
 }    
 async function getAll(req, res){
@@ -17,8 +17,8 @@ async function getAll(req, res){
 async function getData(req, res){
     try{
         const {processName} = req.body; 
-        let data = await utils.exec(`pm2 show ${processName} --json`);
-        res.json(data);
+        let allProjects = await _getAll();
+        res.json(allProjects.find(p=>p.name==processName));
     }catch(err){
         utils.writeLog("pm2.getData", err.toString());
         res.json({ error: err.toString() });

@@ -1,0 +1,118 @@
+const { spawn } = require('child_process');
+const fs = require("fs");
+const path = require("paht");
+
+function exec(command, parametters = []){
+    return new Promise((resolve, reject)=>{
+        // Ejecutar un comando (ejemplo: listar directorios)
+        const execCommand = spawn(command, parametters);
+    
+        execCommand.stdout.on('data', (data) => {
+            command(data);
+        });
+    
+        execCommand.stderr.on('data', (data) => {
+            reject(`Error estándar: ${data}`);
+        });
+    
+        execCommand.on('close', (code) => {
+            //marca la finalizacion del proceso
+            //console.log(`El proceso terminó con el código ${code}`);
+        });
+    })
+}
+
+let nginxDefaultConfig = `
+server {
+    server_name @DOMINIO@; #puede ser "www.mateflix.app mateflix.app" (sin comillas dobles) 
+    location / {
+        proxy_pass http//localhost:@PUERTO@; #cambiar por el puerto utilizado en node
+        
+        proxy_http_version 1.1; #para soportar web sockets
+        proxy_set_header Upgrade $http_upgrade; #para soportar web sockets
+        proxy_set_header Connection 'upgrade'; #para soportar web sockets
+        proxy_set_header Host $host; #para cuando se trabajan con multiples host / servidores virtuales
+        proxy_cache_bypass $http_upgrade; #para q las conexiones con websocket no trabajen sobre el cache
+        
+        client_max_body_size 5M; #tamaño maximo de datos
+        
+        # Ajustar los tiempos de espera para evitar timeouts
+        proxy_read_timeout 90s;
+        proxy_connect_timeout 90s;
+        proxy_send_timeout 90s;
+    }
+}`;
+
+async function initAll(){
+    //pm2
+    let pm2 = await exec(`pm2 -v`);
+    let pm2Ok = false;
+    if(pm2){
+        const regex = /^\d+\.\d+\.\d+$/;
+        if(regex.test(pm2)) pm2Ok = true;
+    }
+    console.log(`Check pm2 -> ${pm2Ok ? "OK" : "ERROR"}`);
+
+    //nginx
+    let nginx = await exec(`nginx --version`);
+    console.log(`Check nginx -> ${nginx.startWith("nginx version") ? "OK" : "ERROR"}`);
+
+    //fail2ban
+    let fail2ban = await exec(`fail2ban-client --version`);
+    console.log(`Check fail2ban -> ${fail2ban.startWith("Fail2Ban") ? "OK" : "ERROR"}`);
+
+    //ufw
+    let ufw = await exec(`ufw --version`);
+    console.log(`Check ufw -> ${ufw.startWith("ufw") ? "OK" : "ERROR"}`);
+
+    //git
+    let git = await exec(`git --version`);
+    console.log(`Check git -> ${git.startWith("git version") ? "OK" : "ERROR"}`);
+
+    //mysql
+    let mysql = await exec(`mysql --version`);
+    console.log(`Check mysql -> ${mysql.startWith("mysql") ? "OK" : "ERROR"}`);
+
+    //mongo
+    let mongo = await exec(`mongod --version`);
+    console.log(`Check mongo -> ${mongo.startWith("db version") ? "OK" : "ERROR"}`);
+
+    //crea nginx
+    if(fs.existsSync("/etc/nginx/sites-available/appManager") == false){
+        fs.writeFileSync(fs.existsSync("/etc/nginx/sites-available/appManager"), defaultScript);
+        exec(`sudo ln -s /etc/nginx/sites-available/appManager /etc/nginx/sites-enabled/`)
+    }
+
+    //copia .env
+    if(fs.existsSync("/var/www/appManager/.env") == false){
+        fs.copyFileSync(fs.existsSync("/var/www/appManager/.env_example"), fs.existsSync("/var/www/appManager/.env"));
+    }
+
+
+    try{
+        let pm2list = await exec(`pm2 jlist`);
+        if(pm2list){
+            pm2list = JSON.parse(pm2list);
+            let existInPm2 = pm2list.find(p=>p.name== "appManager");
+            if(!existInPm2){
+                let resp = await exec(`pm2 start /var/www/appManager/main.js --name appManager`);
+                let resp2 = await exec(`pm2 save`);
+            }
+        }
+
+        let respNginx = await exec(`nginx -t`);
+        if(respNginx)
+    }catch(err){
+
+    }
+}
+
+
+if(process.argv.length == 0){
+    console.log("execute with domain example 'node auto-config.js mateflix.app'");
+}else{
+    initAll().then(ret=>{
+        console.log("-END-");
+    })
+}
+

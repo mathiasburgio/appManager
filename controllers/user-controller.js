@@ -60,8 +60,12 @@ async function createUser(email = "", password = ""){
     }
     return true;
 }
-
+function isLogged(req, res){
+    let resp = (req?.session?.data?.email == process.env.EMAIL_SUPER_ADMIN);
+    res.json({isLogged: resp});
+}
 module.exports = {
     login,
-    logout
+    logout,
+    isLogged,
 };

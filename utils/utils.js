@@ -16,20 +16,6 @@ function _exec(command, parametters = []){
                 resolve(stdout);
             }
         });
-        /* const execCommand = spawn(command, parametters);
-    
-        execCommand.stdout.on('data', (data) => {
-            command(data);
-        });
-    
-        execCommand.stderr.on('data', (data) => {
-            reject(`Error estándar: ${data}`);
-        });
-    
-        execCommand.on('close', (code) => {
-            //marca la finalizacion del proceso
-            //console.log(`El proceso terminó con el código ${code}`);
-        }); */
     })
 }
 function writeLog(title="title", message="msg", error=false){

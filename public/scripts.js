@@ -24,7 +24,12 @@ class MainScript{
         });
         //nginxEditor.setValue() || nginxEditor.getValue
 
-        this.listProjects();
+        $.get({url: "/user/is-logged"}).then(ret=>{
+            if(ret.isLogged){
+                console.log("Is logged!");
+                this.listProjects();
+            }
+        })
     }
     async login(){
         try{

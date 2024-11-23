@@ -1,0 +1,8 @@
+.cp{
+    cursor: pointer;
+}
+.titulo{
+    font-size: 1rem;
+    font-weight: bold;
+    border-bottom: solid 2px dodgerblue;
+}

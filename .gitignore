@@ -3,5 +3,5 @@ projects/
 sessions/
 .env
 log.txt
-error-log.txt
+log-error.txt
 password

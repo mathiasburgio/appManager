@@ -1,1 +1,0 @@
-2024-11-23 13:06 # project.getList # Error: ENOENT: no such file or directory, scandir 'C:\Users\MathiRyzen\Desktop\proyectos\appManager\projects'

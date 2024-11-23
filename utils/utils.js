@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 const fechas = require("./fechas");
 const uuid = require('uuid');
 
-function exec(command, parametters = []){
+function _exec(command, parametters = []){
     return new Promise((resolve, reject)=>{
         // Ejecutar un comando (ejemplo: listar directorios)
         exec(command, (err, stdout, stderr) => {
@@ -68,7 +68,7 @@ function UUID(){
     return uuid.v4();
 }
 module.exports = {
-    exec,
+    exec: _exec,
     writeLog,
     encryptString,
     decryptString,

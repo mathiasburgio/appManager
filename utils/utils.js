@@ -1,4 +1,4 @@
-const { spawn } = require('child_process');
+const { exec  } = require('child_process');
 const path = require("path")
 const fs = require("fs")
 const bcrypt = require("bcrypt");
@@ -8,7 +8,15 @@ const uuid = require('uuid');
 function exec(command, parametters = []){
     return new Promise((resolve, reject)=>{
         // Ejecutar un comando (ejemplo: listar directorios)
-        const execCommand = spawn(command, parametters);
+        exec(command, (err, stdout, stderr) => {
+            if (err) {
+                console.error(`Error: ${stderr}`);
+                reject(err, stderr);
+            }else{
+                resolve(stdout);
+            }
+        });
+        /* const execCommand = spawn(command, parametters);
     
         execCommand.stdout.on('data', (data) => {
             command(data);
@@ -21,7 +29,7 @@ function exec(command, parametters = []){
         execCommand.on('close', (code) => {
             //marca la finalizacion del proceso
             //console.log(`El proceso terminó con el código ${code}`);
-        });
+        }); */
     })
 }
 function writeLog(title="title", message="msg", error=false){

@@ -1,6 +1,7 @@
 class MainScript{
     constructor(){
         this.projects = [];
+        this.pm2 = [];
         this.currentProject = null;
 
         $("#login [name='show-password']").mousedown(ev=>{
@@ -25,7 +26,7 @@ class MainScript{
         //nginxEditor.setValue() || nginxEditor.getValue
 
         $.get({url: "/user/is-logged"}).then(ret=>{
-            if(ret.isLogged){
+            if(ret?.isLogged == true){
                 console.log("Is logged!");
                 this.listProjects();
             }
@@ -62,26 +63,36 @@ class MainScript{
     async listProjects(){
         try{
             this.currentProject = null;
-            this.projects = await $.get({
+            let resp = await $.get({
                 url: "/projects/get-list"
             });
-            console.log(this.projects)
+            this.projects = resp.projects;
+            this.pm2 = resp.pm2;
     
-
-            let ind = 0;
             let tbody = "";
-            for(let p in this.projects){
-                let project = this.projects[p];
-                let status = `<span class='badge badge-danger'>${project.status}</span>`;
-                if(project.status == "started") status = `<span class='badge badge-success'>${project.status}</span>`;
-                acc += `<tr ind="${ind}" idd="${project.id}">
-                    <td>${project.name}</td>
-                    <td class='text-right'>${project.cpu}</td>
-                    <td class='text-right'>${project.ram}</td>
+            for(let px of this.pm2){
+                let proj = this.projects.find(p=>p.name == px.name);
+
+                let status = `<span class='badge badge-${px.pm2_env.status == "online" ? "success" : "danger"}'>${ px.pm2_env.status }</span>`;
+                tbody += `<tr pm2="${px.pid}" proj="${proj ? proj.id : -1}">
+                    <td>${px.name}</td>
+                    <td class='text-right'>${px.monit.cpu}%</td>
+                    <td class='text-right'>${parseInt(px.monit.memory / 1024 / 1024)}mb</td>
                     <td class='text-right'>${status}</td>
                 </tr>`;
-                ind++;
-                return acc;
+            }
+
+            for(let proj of this.projects){
+                let px = this.pm2.find(p=>p.nmae == px.name);
+                if(!px){
+                    let status = `<span class='badge badge-warning'>no pm2</span>`;
+                    tbody += `<tr pm2="-1" proj="${proj.id}">
+                        <td>${proj.name}</td>
+                        <td class='text-right'>0%</td>
+                        <td class='text-right'>0mb</td>
+                        <td class='text-right'>${status}</td>
+                    </tr>`;
+                }
             }
     
             $("[name='projects'] tbody").html(tbody);
@@ -96,11 +107,10 @@ class MainScript{
             //logueado
             $("main:eq(0)").addClass("d-none");
             $("main:eq(1)").removeClass("d-none");
+
         }catch(err){
             console.log(err);
-            //no logueado
-            $("main:eq(0)").removeClass("d-none");
-            $("main:eq(1)").addClass("d-none");
+            alert("ERROR, check console")
         }
     }
     clearData(){

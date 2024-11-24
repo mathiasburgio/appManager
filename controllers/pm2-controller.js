@@ -2,7 +2,7 @@ const utils = require("../utils/utils");
 
 async function _getAll(){
     let data = await utils.exec(`pm2 jlist`);
-    return data;
+    return JSON.parse(data);
 }    
 async function getAll(req, res){
     try{

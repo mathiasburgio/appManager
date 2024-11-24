@@ -52,10 +52,12 @@ function getOneByName(req, res){
     }
 }
 async function create(req, res){
+    
+    let { name, domain, gitToken, gitUrl, port } = req.body;
+    let projectPath = path.join(__dirname, "..", "projects", name);
+    
     try{
-        let { name, domain, gitToken, gitUrl, port } = req.body;
 
-        let projectPath = path.join(__dirname, "..", "projects", name);
         if( fs.existsSync(projectPath) ) throw "Project name already exist";
 
         let project = {
@@ -113,7 +115,7 @@ async function create(req, res){
         utils.writeLog("project.create", project.name);
         res.json(project);
     }catch(err){
-
+        console.log(err);
         //borra el proceso si no finalizo correctamente
         fs.unlinkSync( projectPath );
         utils.writeLog("project.create", err.toString(), true);

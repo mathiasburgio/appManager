@@ -53,6 +53,7 @@ async function comparePasswordHash(field_password, bd_password){
 function UUID(){
     return uuid.v4();
 }
+
 module.exports = {
     exec: _exec,
     writeLog,

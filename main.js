@@ -11,7 +11,9 @@ const utils = require("./utils/utils")
 const fs = require("fs");
 const os = require("os");
 
+
 require('dotenv').config();
+
 
 //verifico la carpeta de proyectos
 if(fs.existsSync(path.join(__dirname, "projects")) == false){

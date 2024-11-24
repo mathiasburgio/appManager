@@ -51,37 +51,41 @@
                     <div class="input-group">
                         <input type="password" class="form-control" autocomplete="off" name="password">
                         <div class="input-group-append">
-                            <button class="btn btn-light border" name="show-password"><i class="fas fa-eye-slash"></i></button>
+                            <button class="btn btn-flat btn-light border" name="show-password"><i class="fas fa-eye-slash"></i></button>
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary" name="login">Login</button>
+                <button class="btn btn-flat btn-primary" name="login">Login</button>
             </div>
         </article>
     </main>
     <!--LOGIN-END-->
 
-    <main class="container-fluid my-5 d-none" id="panel">
+    <main class="container-fluid my-3 d-none" id="panel">
+        <div class="text-right mb-3">
+            <button class="btn btn-flat btn-secondary mr-2" name="console"><i class="fas fa-terminal"></i> Console log</button>
+            <button class="btn btn-flat btn-danger" name="logout"><i class="fas fa-arrow-right-from-bracket"></i> Logout</button>
+        </div>
         <div class="row">
-            <div class="col-4">
+            <div class="col-5">
                 <div class="card">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-8">
-                                <button class="btn btn-success btn-block" name="nuevo-proyecto"><i class="fas fa-plus"></i> Nuevo proyecto</button>
+                                <button class="btn btn-flat btn-success btn-block" name="new-project"><i class="fas fa-plus"></i> New project</button>
                             </div>
                             <div class="col-4">
-                                <button class="btn btn-danger btn-block" name="borrar-proyecto" disabled><i class="fas fa-trash"></i> Borrar proyecto</button>
+                                <button class="btn btn-flat btn-danger btn-block" name="delete-project" disabled><i class="fas fa-trash"></i> Delete project</button>
                             </div>
                         </div>
                         <div class="border mt-3">
-                            <table class="table table-sm" name="tabla-proyectos">
+                            <table class="table table-sm" name="projects-table">
                                 <thead class="thead-dark">
                                     <tr>
-                                        <th>Nombre</th>
+                                        <th>Name</th>
                                         <th class="text-right">CPU</th>
                                         <th class="text-right">RAM</th>
-                                        <th class="text-right">Estado (pm2)</th>
+                                        <th class="text-right">Status (pm2)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -92,12 +96,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-8">
+            <div class="col-7">
                 <article class="card card-primary card-tabs">
                     <div class="card-header p-0 pt-1">
                         <ul class="nav nav-tabs" id="tabs-headers" role="tablist">
                             <li class="pt-2 px-3">
-                                <h3 class="card-title">Proyecto</h3>
+                                <h3 class="card-title">project</h3>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link active" id="home-tab" data-toggle="pill" href="#home" role="tab" aria-controls="home" aria-selected="true"><i class="fas fa-home"></i> home</a>
@@ -127,37 +131,26 @@
                             <div class="tab-pane fade active show" id="home" role="tabpanel" aria-labelledby="home-tab">
                                 <div class="titulo">1. Datos principales</div>
                                 <div class="form-group">
-                                    <label for="">Nombre</label>
-                                    <input type="text" class="form-control form-control-sm" disabled name="nombre">
+                                    <label for="">Name</label>
+                                    <input type="text" class="form-control form-control-sm" autocomplete="off" disabled name="name">
                                 </div>
                                 <div class="form-group">
-                                    <label for="">Dominio</label>
-                                    <input type="text" class="form-control form-control-sm" disabled name="dominio">
-                                </div>
-                                <button class="btn btn-primary" name="guardar-datos">Guardar datos</button>
-                                
-                                <div class="titulo mt-3">2. Clonar repositorio</div>
-                                <div class="form-group">
-                                    <label for="">Token</label>
-                                    <input type="text" class="form-control form-control-sm" disabled name="token-git">
-                                    <small class="text-muted">Solo para repositorios privados</small>
+                                    <label for="">Domain</label>
+                                    <input type="text" class="form-control form-control-sm" autocomplete="off" disabled name="domain">
                                 </div>
                                 <div class="form-group">
-                                    <label for="">URL repositorio (.git)</label>
-                                    <input type="text" class="form-control form-control-sm" disabled name="url-repo">
+                                    <label for="">Git token</label>
+                                    <input type="text" class="form-control form-control-sm" autocomplete="off" disabled name="git-token">
+                                    <small class="text-muted">*only for private repos</small>
                                 </div>
-                                <button class="btn btn-primary" name="clonar-repo">Clonar repo</button>
-
-                                <div class="titulo mt-3">3. Instalar archivos adicionales</div>
-                                <button class="btn btn-primary mt-2" name="instalar-dependencias">3.1 Instalar dependencias</button>
-                                <br>
-                                <button class="btn btn-primary mt-2" name="clonar-env">3.2 Clonar .env</button>
-                                <br>
-                                <button class="btn btn-primary mt-2" name="crear-archivo-nginx">3.3 Crear archivo nginx</button>
-
+                                <div class="form-group">
+                                    <label for="">Repo url (.git)</label>
+                                    <input type="text" class="form-control form-control-sm" autocomplete="off" disabled name="git-url">
+                                </div>
+                                <button class="btn btn-flat btn-primary" disabled name="create-project">Create project</button>
                             </div>
                             <div class="tab-pane fade" id="nginx" role="tabpanel" aria-labelledby="nginx-tab">
-                                <button class="btn btn-primary" disabled name="crear-nginx-file">Crear archivo de configuración</button>
+                                <button class="btn btn-flat btn-primary" disabled name="crear-nginx-file">Crear archivo de configuración</button>
                                 <textarea name="code-editor"></textarea>
                             </div>
                             <div class="tab-pane fade" id="env" role="tabpanel" aria-labelledby="env-tab">
@@ -166,13 +159,13 @@
                             <div class="tab-pane fade" id="pm2" role="tabpanel" aria-labelledby="pm2-tab">
                                 <div class="row">
                                     <div class="col">
-                                        <button class="btn btn-light btn-block" name="pm2-start"><i class="fas fa-play text-success"></i> Iniciar</button>
+                                        <button class="btn btn-flat btn-light btn-block" name="pm2-start"><i class="fas fa-play text-success"></i> Iniciar</button>
                                     </div>
                                     <div class="col">
-                                        <button class="btn btn-light btn-block" name="pm2-stop"><i class="fas fa-stop text-danger"></i> Detener</button>
+                                        <button class="btn btn-flat btn-light btn-block" name="pm2-stop"><i class="fas fa-stop text-danger"></i> Detener</button>
                                     </div>
                                     <div class="col">
-                                        <button class="btn btn-light btn-block" name="pm2-restart"><i class="fas fa-refresh text-warning"></i> Reiniciar</button>
+                                        <button class="btn btn-flat btn-light btn-block" name="pm2-restart"><i class="fas fa-refresh text-warning"></i> Reiniciar</button>
                                     </div>
                                 </div>
                             </div>

@@ -1,5 +1,6 @@
 class MainScript{
     constructor(){
+
         this.projects = [];
         this.pm2 = [];
         this.currentProject = null;
@@ -17,6 +18,14 @@ class MainScript{
             this.login(ele);
         })
 
+        $("[name='logout']").click(ev=>{
+            this.logout();
+        })
+
+        $("[name='new-project']").click(ev=>{
+            this.newProject();
+        })
+
         this.nginxEditor = CodeMirror.fromTextArea(document.querySelector('#nginx [name="code-editor"]'), {
             lineNumbers: true,
             mode: "javascript", // Puedes cambiar el lenguaje
@@ -25,11 +34,14 @@ class MainScript{
         });
         //nginxEditor.setValue() || nginxEditor.getValue
 
-        $.get({url: "/user/is-logged"}).then(ret=>{
-            if(ret?.isLogged == true){
-                console.log("Is logged!");
-                this.listProjects();
-            }
+        modal.async_esperando("validating...").then(ret=>{
+            $.get({url: "/user/is-logged"}).then(ret=>{
+                if(ret?.isLogged == true){
+                    console.log("Is logged!");
+                    this.listProjects();
+                }
+                modal.ocultar();
+            })
         })
     }
     async login(){
@@ -56,22 +68,22 @@ class MainScript{
             })
         }
     }
-    createNewProject(){
-        this.clearData();
-
+    async logout(){
+        let resp = await modal.pregunta(`Are you sure about logout?`);
+        if(!resp) return;
+        window.location.href = "/user/logout";
     }
     async listProjects(){
         try{
             this.currentProject = null;
             let resp = await $.get({
-                url: "/projects/get-list"
+                url: "/project/get-list"
             });
+            console.log(resp)
             this.projects = resp.projects;
-            this.pm2 = resp.pm2;
     
             let tbody = "";
-            for(let px of this.pm2){
-                let proj = this.projects.find(p=>p.name == px.name);
+            for(let px of this.projects){
 
                 let status = `<span class='badge badge-${px.pm2_env.status == "online" ? "success" : "danger"}'>${ px.pm2_env.status }</span>`;
                 tbody += `<tr pm2="${px.pid}" proj="${proj ? proj.id : -1}">
@@ -113,9 +125,130 @@ class MainScript{
             alert("ERROR, check console")
         }
     }
-    clearData(){
+    newProject(){
         this.currentProject = null;
+        $("[name='delete-project']").prop("disabled", true);
+        $("[name='projects'] tbody tr").removeClass("table-info");
+
         $("#tabs-headers .card-title").html("project");
+        
+        $("#tabs #home [name='name']").prop("disabled", false).val("");
+        $("#tabs #home [name='domain']").prop("disabled", false).val("");
+        $("#tabs #home [name='save-data']").prop("disabled", false);
+        
+        $("#tabs #home [name='token-git']").prop("disabled", false).val("");
+        $("#tabs #home [name='url-git']").prop("disabled", false).val("");
+        $("#tabs #home [name='clone-repo']").prop("disabled", false);
+
+
+        $("#tabs #home [name='clone-repo']").prop("disabled", false);
+        $("#home-tab").click();
+
+        $("#tabs #home [name='create-project']").click(async ev=>{
+            let ele = $(ev.currentTarget);
+            ele.prop("disabled", true);
+            try{
+                let data = {
+                    name: $("#tabs #home [name='name']").val(),
+                    domain: $("#tabs #home [name='domain']").val(),
+                    gitToken: $("#tabs #home [name='git-token']").val(),
+                    gitUrl: $("#tabs #home [name='git-url']").val(),
+                }
+    
+                let resp = await $.post({
+                    url: "/project/create",
+                    data: data
+                });
+                console.log(resp);
+
+                $("#tabs #home [name='name']").prop("disabled", true);
+                $("#tabs #home [name='domain']").prop("disabled", true);
+                this.currentProject = resp.project;
+            }catch(err){
+                console.log(err);
+                modal.mensaje(err.toString());
+                ele.prop("disabled", false);
+            }
+        });
+
+        $("#tabs #home [name='clone-repo']").click(async ev=>{
+            let ele = $(ev.currentTarget);
+            ele.prop("disabled", true);
+            try{
+                if(typeof this?.currentProject?.name != "string"){
+                    modal.mensaje("Error - No project name");
+                    return;
+                }
+                
+                let data = {
+                    projectName: this.currentProject.name,
+                    token: $("#tabs #home [name='token-git']").val(),
+                    url: $("#tabs #home [name='url-git']").val(),
+                }
+    
+                let resp = await $.post({
+                    url: "/git/clone",
+                    data: data
+                });
+
+                $("#tabs #home [name='token-git']").prop("disabled", true);
+                $("#tabs #home [name='url-git']").prop("disabled", true);
+                this.currentProject = resp.project;
+            }catch(err){
+                modal.mensaje(err.toString());
+                ele.prop("disabled", false);
+            }
+        });
+
+        $("#tabs #home [name='install-dependencies']").click(async ev=>{
+            let ele = $(ev.currentTarget);
+            ele.prop("disabled", true);
+            try{
+                if(typeof this?.currentProject?.name != "string"){
+                    modal.mensaje("Error - No project name");
+                    return;
+                }
+
+                let data = {
+                    projectName: this.currentProject.name
+                }
+    
+                let resp = await $.post({
+                    url: "/project/install-dependecies",
+                    data: data
+                });
+                
+                this.currentProject = resp.project;
+            }catch(err){
+                modal.mensaje(err.toString());
+                ele.prop("disabled", false);
+            }
+        });
+
+        $("#tabs #home [name='clone-env']").click(async ev=>{
+            let ele = $(ev.currentTarget);
+            ele.prop("disabled", true);
+            try{
+                if(typeof this?.currentProject?.name != "string"){
+                    modal.mensaje("Error - No project name");
+                    return;
+                }
+
+                let data = {
+                    projectName: this.currentProject.name
+                }
+    
+                let resp = await $.post({
+                    url: "/project/clone-env",
+                    data: data
+                });
+                
+                this.currentProject = resp.project;
+            }catch(err){
+                modal.mensaje(err.toString());
+                ele.prop("disabled", false);
+            }
+        });
     }
     async selectProject(projectId){
         this.currentProject = this.projects.find(p=>p.id == projectId);

@@ -159,8 +159,9 @@ class MainScript{
                     titulo: "Procesing",
                     cuerpo: "<div name='log'></div>",
                     fnMostrar2: async () =>{
-                        const log = document.querySelector("#modal [name='log']");
-                        
+                        $("#modal .modal-footer").addClass("d-none");
+                        const log = $("#modal [name='log']");
+
                         const response = await fetch('/project/create', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -173,10 +174,12 @@ class MainScript{
                         while (true) {
                             const { value, done } = await reader.read();
                             if (done) break; // Finalizar cuando el servidor cierre la conexión
-                            log.textContent += decoder.decode(value);
+                            let content = decoder.decode(value);
+                            log.append(`<p>${content}</p>`);
                         }
-
-                    }
+                        $("#modal .modal-footer").removeClass("d-none");
+                    },
+                    botones: "volver"
                 })
                 
     

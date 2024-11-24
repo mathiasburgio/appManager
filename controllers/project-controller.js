@@ -57,7 +57,7 @@ async function create(req, res){
     res.setHeader('Connection', 'keep-alive');
 
     const sendProgress = (message) => {
-        res.write(`data: ${JSON.stringify({ message })}\n\n`);
+        res.write(`${message}`);
     };
 
     let { name, domain, gitToken, gitUrl, port } = req.body;
@@ -96,7 +96,6 @@ async function create(req, res){
         //git
         sendProgress("Cloning repository...");
         let retGit = await git._clone(gitToken, gitUrl, name);
-        console.log({gitClone: retGit})
 
         if(retGit?.error) throw retGit.error;
         sendProgress("Cloning repository...OK");
@@ -105,14 +104,12 @@ async function create(req, res){
         //install dependencies
         sendProgress("Installing dependencies...");
         let retNpmInstall = await utils.exec(`npm install ${project.path}`);
-        sendProgress("Cloning repository...OK");
-        console.log({npmInstall: retNpmInstall})
+        sendProgress("Installing dependencies...OK");
 
         //.env
         sendProgress("Cloning .env_example (or .env-example)...");
         let retCloneEnv = env._cloneExample(project);
         sendProgress("Cloning .env_example (or .env-example)...OK");
-        console.log({cloneEnv: retCloneEnv})
 
         //port
         sendProgress("Obtaining port...");
@@ -140,7 +137,7 @@ async function create(req, res){
         //borra el proceso si no finalizo correctamente
         fs.unlinkSync( projectPath );
         utils.writeLog("project.create", err.toString(), true);
-        sendProgress("ERROR: " + err.toString());
+        sendProgress("ERROR => " + err.toString());
         res.end();
     }
 }

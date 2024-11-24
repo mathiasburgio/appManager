@@ -24,30 +24,26 @@ function _read(project){
         if(fs.existsSync( path.join(project.path, ".env") ) == false) return obj;
 
         let content = fs.readFileSync(path.join(project.path, ".env"), "utf-8");
-        console.log({content})
         let lines = content.split("\n");
         for(let line of lines){
             line = line.trim();
-            if(line){
+            if(line && !line.startsWith("#")){
                 let prop = "";
                 let val = "";
                 let comment = "";
                 
                 let propVal = line.split("=");
-                if(propVal == 2){
-                    prop = propVal[0];
+                if(propVal.length == 2){
+                    prop = propVal[0].trim();
 
-                    let valComment = val.split("#");
-                    if(valComment == 2){
-                        val = valComment[0];
-                        comment = valComment[1];
-                    }else{
-                        val = propVal[1];
-                    }
+                    let valComment = propVal[1].split("#");
+                    val = valComment[0].trim();
+                    if(valComment.length == 2) comment = valComment[1];
                 }
+
                 if(val.startsWith("\"")) val = val.substring(1);//remove start cuote
-                if(val.endsWith("\";")) val = val.substring(0,-2);//remove end cuote and semicolon
-                if(val.endsWith("\"")) val = val.substring(0,-1);//remove end cuote
+                if(val.endsWith("\";")) val = val.substring(0, val.length - 2);//remove end cuote and semicolon
+                if(val.endsWith("\"")) val = val.substring(0, val.length - 1);//remove end cuote
                 obj.push({
                     prop: prop,
                     val: val,
@@ -55,7 +51,6 @@ function _read(project){
                 })
             }
         }
-        console.log({_read: obj});
         return obj;
     }catch(err){
         utils.writeLog("env._read", err.toString());

@@ -52,12 +52,20 @@ function getOneByName(req, res){
     }
 }
 async function create(req, res){
-    
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const sendProgress = (message) => {
+        res.write(`data: ${JSON.stringify({ message })}\n\n`);
+    };
+
     let { name, domain, gitToken, gitUrl, port } = req.body;
     let projectPath = path.join(__dirname, "..", "projects", name);
     
     try{
 
+        sendProgress("Creating project...");
         if( fs.existsSync(projectPath) ) throw "Project name already exist";
 
         let project = {
@@ -83,43 +91,57 @@ async function create(req, res){
 
         //save project
         fs.writeFileSync( projectPath, JSON.stringify(project, null, 2) );
+        sendProgress("Creating project...OK");
         
         //git
+        sendProgress("Cloning repository...");
         let retGit = await git._clone(gitToken, gitUrl, name);
         console.log({gitClone: retGit})
 
         if(retGit?.error) throw retGit.error;
+        sendProgress("Cloning repository...OK");
         //project.path = path.join(process.env.WWW_PATH, retGit);
 
         //install dependencies
-        let retNpmInstall = await utils.exec(`npm instal ${project.path}`);
+        sendProgress("Installing dependencies...");
+        let retNpmInstall = await utils.exec(`npm install ${project.path}`);
+        sendProgress("Cloning repository...OK");
         console.log({npmInstall: retNpmInstall})
 
         //.env
+        sendProgress("Cloning .env_example (or .env-example)...");
         let retCloneEnv = env._cloneExample(project);
+        sendProgress("Cloning .env_example (or .env-example)...OK");
         console.log({cloneEnv: retCloneEnv})
 
         //port
+        sendProgress("Obtaining port...");
         if(port){
             env._setValue(project, "PORT", port);
         }else{
             port = env._getValue(project, "PORT");
         }
         if(!port) throw "No PORT detected for project";
+        sendProgress(`Port will be ${port}`);
 
         //nginx
+        sendProgress("Creating virtual server (nginx config file)...");
         let retNginx = nginx._createConfigFile(domain, port);
+        sendProgress("Creating virtual server (nginx config file)...OK");
 
         //re-save project
         fs.writeFileSync( projectPath, JSON.stringify(project, null, 2) );
         utils.writeLog("project.create", project.name);
-        res.json(project);
+        
+        sendProgress("Process finish!");
+        res.end();
     }catch(err){
         console.log(err);
         //borra el proceso si no finalizo correctamente
         fs.unlinkSync( projectPath );
         utils.writeLog("project.create", err.toString(), true);
-        res.json({ error: err.toString() });
+        sendProgress("ERROR: " + err.toString());
+        res.end();
     }
 }
 

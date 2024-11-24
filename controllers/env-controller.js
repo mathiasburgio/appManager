@@ -24,6 +24,7 @@ function _read(project){
         if(fs.existsSync( path.join(project.path, ".env") ) == false) return obj;
 
         let content = fs.readFileSync(path.join(project.path, ".env"), "utf-8");
+        console.log({content})
         let lines = content.split("\n");
         for(let line of lines){
             line = line.trim();
@@ -54,7 +55,7 @@ function _read(project){
                 })
             }
         }
-        
+        console.log({_read: obj});
         return obj;
     }catch(err){
         utils.writeLog("env._read", err.toString());

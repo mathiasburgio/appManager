@@ -85,7 +85,7 @@ async function create(req, res){
         fs.writeFileSync( projectPath, JSON.stringify(project, null, 2) );
         
         //git
-        let retGit = await git._clone(gitToken, gitUrl);
+        let retGit = await git._clone(gitToken, gitUrl, name);
         console.log({gitClone: retGit})
 
         if(retGit.error) throw retGit.error;

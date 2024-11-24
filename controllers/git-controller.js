@@ -3,26 +3,17 @@ const path = require("path");
 const fs = require("fs");
 const projectController = require("./project-controller");
 
-async function _clone(token, url){
+async function _clone(token, url, projectName){
+    let execResp = null;
     try{
-        let execResp = null;
-        let folder = null;
-        let dirsPrevClone = fs.readdirSync( path.join(process.env.WWW_PATH) );
+        let newFolderName = path.join(process.env.WWW_PATH, projectName);
         if(token){
-            execResp = await utils.exec(`git clone https://${token}:x-oauth-basic@${url}`)
+            execResp = await utils.exec(`git clone https://${token}:x-oauth-basic@${url} ${newFolderName}`)
         }else{
-            execResp = await utils.exec(`git clone ${url}`)
-        }
-        let dirsPosClone = fs.readdirSync( path.join(process.env.WWW_PATH) );
-        
-        if(dirsPrevClone.length == dirsPosClone.length -1){
-            //verifico que haya un directorio extra luego del clonado
-            dirsPosClone.forEach(dir=>{
-                if(dirsPrevClone.includes(dir)) folder = dir;
-            })
+            execResp = await utils.exec(`git clone ${url} ${newFolderName}`)
         }
 
-        return {execResp, folder};
+        return execResp;
     }catch(err){
         utils.writeLog("env.clonarExample", err.toString());
         return {error: execResp};

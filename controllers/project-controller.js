@@ -64,7 +64,7 @@ async function create(req, res){
             id: utils.UUID(),
             name: name,
             domain: domain,
-            path: "",//al clonar el repo deberia agregarse aqui el directorio
+            path: path.join(process.env.WWW_PATH, name),
             actions: {
                 ping: {
                     url: "/ping",
@@ -88,8 +88,8 @@ async function create(req, res){
         let retGit = await git._clone(gitToken, gitUrl, name);
         console.log({gitClone: retGit})
 
-        if(retGit.error) throw retGit.error;
-        project.path = path.join(process.env.WWW_PATH, retGit.folder);
+        if(retGit?.error) throw retGit.error;
+        //project.path = path.join(process.env.WWW_PATH, retGit);
 
         //install dependencies
         let retNpmInstall = await utils.exec(`npm instal ${project.path}`);

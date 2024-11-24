@@ -144,107 +144,48 @@ class MainScript{
         $("#tabs #home [name='clone-repo']").prop("disabled", false);
         $("#home-tab").click();
 
-        $("#tabs #home [name='create-project']").click(async ev=>{
+        $("#tabs #home [name='create-project']").click(ev=>{
             let ele = $(ev.currentTarget);
-            ele.prop("disabled", true);
-            try{
-                let data = {
-                    name: $("#tabs #home [name='name']").val(),
-                    domain: $("#tabs #home [name='domain']").val(),
-                    gitToken: $("#tabs #home [name='git-token']").val(),
-                    gitUrl: $("#tabs #home [name='git-url']").val(),
-                }
-    
-                let resp = await $.post({
-                    url: "/project/create",
-                    data: data
-                });
-                console.log(resp);
+            
+            let data = {
+                name: $("#tabs #home [name='name']").val(),
+                domain: $("#tabs #home [name='domain']").val(),
+                gitToken: $("#tabs #home [name='git-token']").val(),
+                gitUrl: $("#tabs #home [name='git-url']").val(),
+            }
 
+            try{
+                modal.mostrar({
+                    titulo: "Procesing",
+                    cuerpo: "<div name='log'></div>",
+                    fnMostrar2: async () =>{
+                        const log = document.querySelector("#modal [name='log']");
+                        
+                        const response = await fetch('/project/create', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+        
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder("utf-8");
+        
+                        while (true) {
+                            const { value, done } = await reader.read();
+                            if (done) break; // Finalizar cuando el servidor cierre la conexión
+                            log.textContent += decoder.decode(value);
+                        }
+
+                    }
+                })
+                
+    
+                /* 
                 $("#tabs #home [name='name']").prop("disabled", true);
                 $("#tabs #home [name='domain']").prop("disabled", true);
-                this.currentProject = resp.project;
+                this.currentProject = resp.project; */
             }catch(err){
                 console.log(err);
-                modal.mensaje(err.toString());
-                ele.prop("disabled", false);
-            }
-        });
-
-        $("#tabs #home [name='clone-repo']").click(async ev=>{
-            let ele = $(ev.currentTarget);
-            ele.prop("disabled", true);
-            try{
-                if(typeof this?.currentProject?.name != "string"){
-                    modal.mensaje("Error - No project name");
-                    return;
-                }
-                
-                let data = {
-                    projectName: this.currentProject.name,
-                    token: $("#tabs #home [name='token-git']").val(),
-                    url: $("#tabs #home [name='url-git']").val(),
-                }
-    
-                let resp = await $.post({
-                    url: "/git/clone",
-                    data: data
-                });
-
-                $("#tabs #home [name='token-git']").prop("disabled", true);
-                $("#tabs #home [name='url-git']").prop("disabled", true);
-                this.currentProject = resp.project;
-            }catch(err){
-                modal.mensaje(err.toString());
-                ele.prop("disabled", false);
-            }
-        });
-
-        $("#tabs #home [name='install-dependencies']").click(async ev=>{
-            let ele = $(ev.currentTarget);
-            ele.prop("disabled", true);
-            try{
-                if(typeof this?.currentProject?.name != "string"){
-                    modal.mensaje("Error - No project name");
-                    return;
-                }
-
-                let data = {
-                    projectName: this.currentProject.name
-                }
-    
-                let resp = await $.post({
-                    url: "/project/install-dependecies",
-                    data: data
-                });
-                
-                this.currentProject = resp.project;
-            }catch(err){
-                modal.mensaje(err.toString());
-                ele.prop("disabled", false);
-            }
-        });
-
-        $("#tabs #home [name='clone-env']").click(async ev=>{
-            let ele = $(ev.currentTarget);
-            ele.prop("disabled", true);
-            try{
-                if(typeof this?.currentProject?.name != "string"){
-                    modal.mensaje("Error - No project name");
-                    return;
-                }
-
-                let data = {
-                    projectName: this.currentProject.name
-                }
-    
-                let resp = await $.post({
-                    url: "/project/clone-env",
-                    data: data
-                });
-                
-                this.currentProject = resp.project;
-            }catch(err){
                 modal.mensaje(err.toString());
                 ele.prop("disabled", false);
             }

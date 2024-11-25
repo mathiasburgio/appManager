@@ -5,6 +5,7 @@ const nginx = require("./nginx-controller");
 const env = require("./env-controller");
 const fs = require("fs")
 const path = require("path")
+const fechas = require("../utils/fechas");
 
 function _getList(){
     try{
@@ -57,7 +58,7 @@ async function create(req, res){
     res.setHeader('Connection', 'keep-alive');
 
     const sendProgress = (message) => {
-        res.write(`${message}`);
+        res.write(`${message}<br>`);
     };
 
     let { name, domain, gitToken, gitUrl, port } = req.body;
@@ -133,6 +134,7 @@ async function create(req, res){
         sendProgress("Process finish!");
         res.end();
     }catch(err){
+        console.log("--" + fechas.getNow(true) + "--");
         console.log(err);
         //borra el proceso si no finalizo correctamente
         fs.unlinkSync( projectPath );

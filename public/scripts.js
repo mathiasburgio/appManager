@@ -134,14 +134,10 @@ class MainScript{
         
         $("#tabs #home [name='name']").prop("disabled", false).val("");
         $("#tabs #home [name='domain']").prop("disabled", false).val("");
-        $("#tabs #home [name='save-data']").prop("disabled", false);
+        $("#tabs #home [name='git-token']").prop("disabled", false).val("");
+        $("#tabs #home [name='git-url']").prop("disabled", false).val("");
+        $("#tabs #home [name='create-project']").prop("disabled", false);
         
-        $("#tabs #home [name='token-git']").prop("disabled", false).val("");
-        $("#tabs #home [name='url-git']").prop("disabled", false).val("");
-        $("#tabs #home [name='clone-repo']").prop("disabled", false);
-
-
-        $("#tabs #home [name='clone-repo']").prop("disabled", false);
         $("#home-tab").click();
 
         $("#tabs #home [name='create-project']").click(ev=>{
@@ -160,7 +156,7 @@ class MainScript{
                     cuerpo: "<div name='log'></div>",
                     fnMostrar2: async () =>{
                         $("#modal .modal-footer").addClass("d-none");
-                        const log = $("#modal [name='log']");
+                        let log = "";
 
                         const response = await fetch('/project/create', {
                             method: 'POST',
@@ -175,7 +171,8 @@ class MainScript{
                             const { value, done } = await reader.read();
                             if (done) break; // Finalizar cuando el servidor cierre la conexión
                             let content = decoder.decode(value);
-                            log.append(`<p>${content}</p>`);
+                            log += content;
+                            $("#modal [name='log']").html(log);
                         }
                         $("#modal .modal-footer").removeClass("d-none");
                     },

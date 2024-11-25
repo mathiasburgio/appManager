@@ -25,22 +25,22 @@ server {
 
 async function _createConfigFile(domain, port) {
     try{
-        let command1 = defaultScript;
-        command1 = command1.replace("@DOMAIN@", domain);
-        command1 = command1.replace("@PORT@", port);
+        let content = defaultScript;
+        content = content.replace("@DOMAIN@", domain);
+        content = content.replace("@PORT@", port);
         
-        let resp1 = await utils.exec(command1);
+        fs.writeFileSync( `/etc/nginx/sites-available/${domain}`, content);
 
-        let command2 = `sudo ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/`;
+        let command2 = `ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/`;
         let resp2 = await utils.exec(command2);
 
-        let command3 = `sudo nginx -t`;
+        let command3 = `nginx -t`;
         let resp3 = await utils.exec(command3);
         
         return {command1: resp1, command2: resp2, command3: resp3};
     }catch(err){
+        console.log(err);
         utils.writeLog("nginx.crearProyecto", err.toString());
-        res.json({ error: err.toString() });
     }
 }
 async function read(req, res) {

@@ -84,7 +84,7 @@ function _getValue(project, prop){
     prop = prop.toUpperCase();
     let data = _read(project);
     let index = data.findIndex(item=>item.prop == prop);
-    return index > -1 ? data[index] : null;
+    return index > -1 ? data[index].val : null;
 }
 
 function read(req, res){

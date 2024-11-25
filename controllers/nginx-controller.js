@@ -23,73 +23,51 @@ server {
     }
 }`;
 
-async function _createConfigFile(domain, port) {
+function _getFilesList(){
+    let availables = fs.readdirSync( "/etc/nginx/sites-available" );
+    let enabled = fs.readdirSync( "/etc/nginx/sites-available" );
+    return {availables, enabled};
+}
+
+function _readFile(domain){
+    let content = fs.readFile( path.join("/etc/nginx/sites-available/", domain), "utf-8" );
+    return content;
+}
+
+function _defaultScript(domain="DOMAIN", port="PORT") {
+    return defaultScript.replaceAll("@DOMAIN@", domain).replaceAll("@PORT@", port);
+}
+
+function getFilesList(req, res){
     try{
-        let content = defaultScript;
-        content = content.replace("@DOMAIN@", domain);
-        content = content.replace("@PORT@", port);
-        
-        fs.writeFileSync( `/etc/nginx/sites-available/${domain}`, content);
-
-        let command2 = `ln -s /etc/nginx/sites-available/${domain} /etc/nginx/sites-enabled/`;
-        let resp2 = await utils.exec(command2);
-
-        let command3 = `nginx -t`;
-        let resp3 = await utils.exec(command3);
-        
-        return {command1: resp1, command2: resp2, command3: resp3};
+        res.json(_getFilesList());
     }catch(err){
-        console.log(err);
-        utils.writeLog("nginx.crearProyecto", err.toString());
+        utils.writeLog("nginx.getFilesList", err.toString());
+        return {error: err.toString()};
     }
 }
-async function read(req, res) {
+function readFile(req, res){
     try{
-        let { dominio } = req.body;
-    
-        let p = "/etc/nginx/sites-available/" + dominio;
-        
-        if(fs.existsSync(p) == false) throw "No existe el archivo de configuracion nginx";
-        let content = fs.readFileSync(p, "utf-8");
-        
-        let comando = defaultScript;
-        comando = comando.replace("@DOMINIO@", dominio);
-        comando = comando.replace("@PUERTO@", puerto);
-        
-        let resp = await utils.exec(comando);
-
-        let comando2 = `sudo ln -s /etc/nginx/sites-available/${dominio} /etc/nginx/sites-enabled/`;
-        let resp2 = await utils.exec(comando2);
-
-        let comando3 = `sudo nginx -t`;
-        let resp3 = await utils.exec(comando3);
-        res.send(resp3);
-
+        res.json({content: _readFile()});
     }catch(err){
-        utils.writeLog("nginx.crearProyecto", err.toString());
-        res.json({ error: err.toString() });
+        utils.writeLog("nginx.readFile", err.toString());
+        return {error: err.toString()};
     }
 }
-async function write(req, res) {
-    
-}
-async function restart(req, res) {
+function defaultScript(req, res){
     try{
-        let resp1 = await utils.exec("nginx -t");
-        if(resp1.indexOf("syntax is ok") > 0 && resp1.indexOf("test is successful") > 0){
-            let resp2 = await utils.exec("systemctl restart nginx");
-            return {resp1, resp2};
-        }
-        return {resp1};
+        res.json({content: _defaultScript()});
     }catch(err){
-        utils.writeLog("nginx.restart", err.toString());
-        res.json({ error: err.toString() });
+        utils.writeLog("nginx.defaultScript", err.toString());
+        return {error: err.toString()};
     }
 }
 
 module.exports = {
-    _createConfigFile,
-    read,
-    write,
-    restart
+    _getFilesList,
+    _readFile,
+    _defaultScript,
+    getFilesList,
+    readFile,
+    defaultScript
 };

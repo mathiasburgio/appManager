@@ -1,4 +1,5 @@
 const utils = require("../utils/utils");
+const os = require("os");
 
 async function _getAll(){
     let data = await utils.exec(`pm2 jlist`);

@@ -31,9 +31,6 @@ function pull(req, res){
         res.json({ error: err.toString() });
     }
 }
-function rollback(req, res){
-
-}
 
 module.exports = {
     _clone,

@@ -2,7 +2,6 @@ class MainScript{
     constructor(){
 
         this.projects = [];
-        this.pm2 = [];
         this.currentProject = null;
 
         $("#login [name='show-password']").mousedown(ev=>{

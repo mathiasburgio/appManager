@@ -46,8 +46,10 @@ function _envDecoder(envPath){
 async function _changeStatus(newStatus, projectName){
     try{
         let resp = await utils.exec(`pm2 ${newStatus} ${projectName}`);
+        console.log("_change status: " + resp)
         return resp;
     }catch(err){
+        console.log(err);
         return null;
     }
 }

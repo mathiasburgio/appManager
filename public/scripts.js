@@ -133,7 +133,7 @@ class MainScript{
         $("[name='btn-status']").html(btnStatusText)
     }
     async changeStatus(newStatus){
-        let askResponse = await modal.pregunta(`Confirm execute ${newStatus} on ${this.currentProject.name}?`);
+        let askResponse = await modal.pregunta(`Confirm execute <b>${newStatus}</b> on <b>${this.currentProject.name}</b>?`);
         if(!askResponse) return;
 
         await modal.async_esperando("Updating...");

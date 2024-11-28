@@ -61,6 +61,7 @@ async function _projectsList(){
             let [app, domain] = ad.split(":");
             auxAppDomains[app.trim()] = domain.trim();
         }
+        console.log({auxAppDomains})
 
         let resp = await utils.exec(`pm2 jlist`);
         resp = JSON.parse(resp);

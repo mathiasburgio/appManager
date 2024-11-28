@@ -130,24 +130,6 @@ async function logs(req, res){
         res.json({error: err});
     }
 }
-/* function createProject(req, res){
-    try{
-        let {projectName, domain} = req.body;
-        let projectPath = path.join(process.env.WWW_PATH, projectName);
-        if(fs.existsSync(projectPath) == true) throw "Project already exist.";
-
-        let project = {
-            uuid: utils.UUID(),
-            name: projectName,
-            domain: domain
-        };
-
-        fs.writeFileSync(projectPath, JSON.stringify(project, null, 2));
-    }catch(err){
-
-    }
-}
- */
 module.exports = {
     changeStatus,
     gitPull,

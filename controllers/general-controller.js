@@ -70,6 +70,7 @@ async function _projectsList(){
             //let projectPath = path.join(process.env.WWW_PATH, proj.name);
             let envPath = path.join(process.env.WWW_PATH, proj.name, ".env");
             let nginxPath = path.join(`/etc/nginx/sites-available/${auxAppDomains?.[proj.name] || proj.name}`);
+            console.log({nginxPath})
             proj.env = _envDecoder(envPath);
             if(fs.existsSync(nginxPath)) proj.nginx = fs.readFileSync(nginxPath, "utf-8");
         }

@@ -115,7 +115,7 @@ To add projects for management, follow these steps via SSH:
     #Open file
     nano /var/www/appManager/.env
     #Edit next line and save
-    APP_NGINX_ASSOCIATION="app1 : nginxFile & app2 : nginxFile2"
+    APP_NGINX_ASSOCIATION="appName1 : nginxFile1 & appName2 : nginxFile2"
     #Restart appManager
     pm2 restart appManager
 ```

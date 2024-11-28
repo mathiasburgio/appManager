@@ -30,7 +30,13 @@ Before configuring **appManager**, ensure you have the following installed and w
    ```bash
    cd /var/www
    git clone https://github.com/mathiasburgio/appManager
+   ```
 
+2. **[appUser] Copy `.env_example` and edit it**  
+```bash
+   cd /var/www/appManager
+   npm install
+```
 
 
 

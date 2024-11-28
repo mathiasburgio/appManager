@@ -81,14 +81,16 @@ async function gitPull(req, res){
     try{
         let {projectName} = req.body;
         let projectPath = path.join(process.env.WWW_PATH, projectName);
-
+        console.log({projectName, projectPath});
         // Agregar el directorio como seguro
         await utils.exec(`git config --global --add safe.directory ${projectPath}`);
 
         //ejecuta git pull
         let resp = await utils.exec(`git pull ${projectPath}`);
+        console.log(resp);
         res.end(resp);
     }catch(err){
+        console.log(err);
         res.json({error: err});
     }
 }

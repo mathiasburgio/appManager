@@ -1,6 +1,6 @@
 class MainScript{
     constructor(){
-
+        this.projectLogs = {};
         this.projects = [];
         this.currentProject = null;
 
@@ -61,13 +61,23 @@ class MainScript{
             }
             this.showEnv();
         })
-        $("[name='flush-logs'").click(ev=>{
+        $("[name='show-out-log'").click(ev=>{
             if(!this.currentProject){
                 modal.mensaje(`No project selected`);
                 return;
             }
-            if(this.currentProject.name == "appManager"){
-                modal.mensaje("To make changes to appManager, you must do so from the terminal/console.")
+            this.showLog(false);
+        })
+        $("[name='show-err-log'").click(ev=>{
+            if(!this.currentProject){
+                modal.mensaje(`No project selected`);
+                return;
+            }
+            this.showLog(true);
+        })
+        $("[name='flush-logs'").click(ev=>{
+            if(!this.currentProject){
+                modal.mensaje(`No project selected`);
                 return;
             }
             this.flushLogs();
@@ -127,7 +137,7 @@ class MainScript{
                 let status = `<span class='badge badge-${px.pm2_env.status == "online" ? "success" : "danger"}'>${ px.pm2_env.status }</span>`;
                 tbody += `<tr class="cp" projectName="${px.name}">
                     <td>${px.name}</td>
-                    <td class='text-right'>${px.pm2_env.restart_time}%</td>
+                    <td class='text-right'>${px.pm2_env.restart_time}</td>
                     <td class='text-right'>${px.monit.cpu}%</td>
                     <td class='text-right'>${parseInt(px.monit.memory / 1024 / 1024)}mb</td>
                     <td class='text-right'>${status}</td>
@@ -139,6 +149,7 @@ class MainScript{
                 let row =$(ev.currentTarget);
                 let projectName = row.attr("projectName");
                 this.selectProject(projectName);
+                this.obtainLogs();
             });
 
             //logueado
@@ -149,6 +160,12 @@ class MainScript{
             console.log(err);
             alert("ERROR, check console");
         }
+    }
+    async obtainLogs(){
+        await modal.async_esperando("Obtaining logs...");
+        let resp = await $.get({url: "/general/logs/" + this.currentProject.name});
+        this.projectLogs[this.currentProject.name] = resp;
+        modal.ocultar();
     }
     clearProject(){
         this.currentProject = null;
@@ -217,13 +234,10 @@ class MainScript{
         $("[name='log-viewer'] textarea").val("Nothing to see here...");
         modal.ocultar();
     } 
-    async getLogs(err=false){
-        let ret = await $.post({
-            url: "/general/flush-logs",
-            data:{ projectName: this.currentProject.name}
-        })
-        console.log(ret);
-        this.currentProject.logs = ret;
+    async showLog(err=false){
+        let content = this.projectLogs[this.currentProject.name][err ? "err" : "out"];
+        $("[name='log-viewer'] textarea").val(content);
+        showElement("log-viewer");
     }
     showNginxFile(){
         $("[name='nginx-file'] textarea").val(this.currentProject?.nginx || `/etc/nginx/sites-available/${this.currentProject.name} not founded`);

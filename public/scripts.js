@@ -27,12 +27,19 @@ class MainScript{
                 modal.mensaje("No project selected");
                 return;
             }
-            //if(this.currentProject.name == "appManager") return;
+            if(this.currentProject.name == "appManager"){
+                modal.mensaje("To make changes to appManager, you must do so from the terminal/console.")
+                return;
+            }
             this.changeStatus(newStatus);
         })
         $("[name='git-pull']").click(ev=>{
             if(!this.currentProject){
                 modal.mensaje(`No project selected`);
+                return;
+            }
+            if(this.currentProject.name == "appManager"){
+                modal.mensaje("To make changes to appManager, you must do so from the terminal/console.")
                 return;
             }
             this.gitPull();
@@ -149,7 +156,7 @@ class MainScript{
         
         $(".modal-body").html("Listing projects...");
         await this.listProjects()
-        selectProject(saveProjectName);
+        this.selectProject(saveProjectName);
         modal.ocultar();
     }
     async gitPull(){

@@ -51,6 +51,23 @@ async function _changeStatus(newStatus, projectName){
         return null;
     }
 }
+async function _projectsList(){
+    try{
+        let resp = await utils.exec(`pm2 jlist`);
+        resp = JSON.parse(resp);
+        //let files = fs.readdirSync(path.join(__dirname, "projects"));
+        for(let proj of resp){
+            //let projectPath = path.join(process.env.WWW_PATH, proj.name);
+            let envPath = path.join(process.env.WWW_PATH, proj.name, ".env");
+            let nginxPath = path.join(`/etc/nginx/sites-available/${proj.name}`);
+            proj.env = _envDecoder(envPath);
+            if(fs.existsSync(nginxPath)) proj.nginx = fs.readFileSync(nginxPath, "utf-8");
+        }
+        return resp;
+    }catch(err){
+        throw err;
+    }
+}
 async function changeStatus(req, res){
     try{
         let {newStatus, projectName} = req.body;
@@ -72,16 +89,7 @@ async function gitPull(req, res){
 }
 async function projectsList(req, res){
     try{
-        let resp = await utils.exec(`pm2 jlist`);
-        resp = JSON.parse(resp);
-        //let files = fs.readdirSync(path.join(__dirname, "projects"));
-        for(let proj of resp){
-            //let projectPath = path.join(process.env.WWW_PATH, proj.name);
-            let envPath = path.join(process.env.WWW_PATH, proj.name, ".env");
-            let nginxPath = path.join(`/etc/nginx/sites-available/${proj.name}`);
-            proj.env = _envDecoder(envPath);
-            if(fs.existsSync(nginxPath)) proj.nginx = fs.readFileSync(nginxPath, "utf-8");
-        }
+        let resp = await _projectsList();
         res.json(resp);
     }catch(err){
         console.log(err);
@@ -100,11 +108,15 @@ async function flushLogs(req, res){
 async function logs(req, res){
     try{
         let { projectName } = req.params;
-        console.log(projectName);
-        let resp = {
-            err: await utils.exec(`pm2 logs ${projectName} --err --lines 1000 --nostream`),
-            out: await utils.exec(`pm2 logs ${projectName} --out --lines 1000 --nostream`),
-        };
+        let projects = await _projectsList();
+        let project = projects.find(p=>p.name == projectName);
+        if(!project) throw "Project not finded";
+        let errPath = project.pm2_env?.pm_err_log_path;
+        let outPath = project.pm2_env?.pm_out_log_path;
+
+        let resp = {};
+        if(fs.existsSync(errPath)) resp.err = fs.readFileSync(errPath, "utf8").split('\n').slice(-1000).join('\n');;
+        if(fs.existsSync(outPath)) resp.err = fs.readFileSync(outPath, "utf8").split('\n').slice(-1000).join('\n');;
         res.json(resp);
     }catch(err){
         console.log(err);

@@ -76,7 +76,7 @@ async function _projectsList(){
 async function changeStatus(req, res){
     try{
         let {newStatus, projectName} = req.body;
-        console.log(1);
+        console.log(1, {newStatus, projectName});
         let resp = await _changeStatus(newStatus, projectName);
         console.log(10);
         res.end("ok");

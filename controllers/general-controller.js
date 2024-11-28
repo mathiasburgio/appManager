@@ -73,6 +73,7 @@ async function gitPull(req, res){
 async function projectsList(req, res){
     try{
         let resp = await utils.exec(`pm2 jlist`);
+        resp = JSON.parse(resp);
         //let files = fs.readdirSync(path.join(__dirname, "projects"));
         for(let proj of resp){
             let projectPath = path.join(process.env.WWW_PATH, projectName);
@@ -83,6 +84,7 @@ async function projectsList(req, res){
         }
         res.end("ok");
     }catch(err){
+        console.log(err);
         res.json({error: err});
     }
 }

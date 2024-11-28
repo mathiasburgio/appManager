@@ -78,7 +78,7 @@ async function projectsList(req, res){
         for(let proj of resp){
             //let projectPath = path.join(process.env.WWW_PATH, proj.name);
             let envPath = path.join(process.env.WWW_PATH, proj.name, ".env");
-            let nginxPath = path.join(`/etc/nginx/${proj.name}`);
+            let nginxPath = path.join(`/etc/nginx/sites-available/${proj.name}`);
             proj.env = _envDecoder(envPath);
             if(fs.existsSync(nginxPath)) proj.nginx = fs.readFileSync(nginxPath);
         }

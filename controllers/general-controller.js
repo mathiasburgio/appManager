@@ -1,6 +1,7 @@
 const utils = require("../utils/utils.js");
 const path = require("path");
 const fs = require("fs");
+const os = require("os");
 const platform = os.platform(); // 'darwin', 'win32', 'linux', etc.
 
 function _envDecoder(envPath){

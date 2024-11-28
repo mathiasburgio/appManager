@@ -129,7 +129,7 @@ class MainScript{
         this.currentProject = this.projects.find(p=>p.name == projectName);
         $("h3[name='project-name']").html(projectName);
 
-        let btnStatusText = `Status: <span class='badge badge-${(this.project.pm2_env.status == "online" ? "success" : "danger")}'>${this.project.pm2_env.status}</span>`;
+        let btnStatusText = `Status: <span class='badge badge-${(this.currentProject.pm2_env.status == "online" ? "success" : "danger")}'>${this.currentProject.pm2_env.status}</span>`;
         $("[name='btn-status']").html(btnStatusText)
     }
     async changeStatus(projectName, newStatus){

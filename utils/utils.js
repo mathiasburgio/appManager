@@ -8,12 +8,13 @@ const uuid = require('uuid');
 function _exec(command, parametters = []){
     return new Promise((resolve, reject)=>{
         // Ejecutar un comando (ejemplo: listar directorios)
-        exec(command, (err, stdout, stderr) => {
-            if (err) {
-                console.error(`Error: ${stderr}`);
-                reject(err, stderr);
-            }else{
-                resolve(stdout);
+        exec(command, { maxBuffer: 1024 * 1024 }, (error, stdout, stderr) => {
+            if (error) {
+                reject(`Error: ${error.message}`);
+            } else if (stderr) {
+                reject(`STDERR: ${stderr}`);
+            } else {
+                resolve(stdout.trim());
             }
         });
     })

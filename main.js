@@ -53,9 +53,9 @@ app.use((req, res, next)=>{
 app.use("/", express.static( path.join(__dirname, "public") ));
 
 app.use(require("./routes/user-routes.js"))
-app.use(require("./routes/env-routes.js"))
-app.use(require("./routes/project-routes.js"))
-/* app.use(require("./routes/pm2-routes.js")) */
+app.use(require("./routes/general-routes.js"))
+/*app.use(require("./routes/project-routes.js"))
+ app.use(require("./routes/pm2-routes.js")) */
 
 //cors
 if(process.env?.CORS === "true") app.use(cors());

@@ -2,6 +2,7 @@ const utils = require("../utils/utils.js");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
+const pm2 = require("pm2");
 const platform = os.platform(); // 'darwin', 'win32', 'linux', etc.
 
 function _envDecoder(envPath){
@@ -44,7 +45,7 @@ function _envDecoder(envPath){
     }
 }
 async function _changeStatus(newStatus, projectName){
-    try{
+    /* try{
         console.log(2);
         let resp = await utils.exec(`pm2 ${newStatus} ${projectName}`);
         console.log(3);
@@ -54,7 +55,21 @@ async function _changeStatus(newStatus, projectName){
         console.log(6);
         console.log(err);
         return null;
-    }
+    } */
+        return new Promise((resolve, reject) => {
+            pm2.connect((err) => {
+                if (err) {
+                    console.error(err);
+                    return reject(err);
+                }
+    
+                pm2[newStatus](projectName, (err, proc) => {
+                    pm2.disconnect();
+                    if (err) return reject(err);
+                    resolve(proc);
+                });
+            });
+        });
 }
 async function _projectsList(){
     try{

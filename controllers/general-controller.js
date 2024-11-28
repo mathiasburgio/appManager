@@ -81,6 +81,11 @@ async function gitPull(req, res){
     try{
         let {projectName} = req.body;
         let projectPath = path.join(process.env.WWW_PATH, projectName);
+
+        // Agregar el directorio como seguro
+        await utils.exec(`git config --global --add safe.directory ${projectPath}`);
+
+        //ejecuta git pull
         let resp = await utils.exec(`git pull ${projectPath}`);
         res.end(resp);
     }catch(err){
@@ -116,7 +121,7 @@ async function logs(req, res){
 
         let resp = {};
         if(fs.existsSync(errPath)) resp.err = fs.readFileSync(errPath, "utf8").split('\n').slice(-1000).join('\n');;
-        if(fs.existsSync(outPath)) resp.err = fs.readFileSync(outPath, "utf8").split('\n').slice(-1000).join('\n');;
+        if(fs.existsSync(outPath)) resp.out = fs.readFileSync(outPath, "utf8").split('\n').slice(-1000).join('\n');;
         res.json(resp);
     }catch(err){
         console.log(err);

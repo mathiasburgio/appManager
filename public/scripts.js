@@ -31,6 +31,10 @@ class MainScript{
             this.changeStatus(newStatus);
         })
         $("[name='git-pull']").click(ev=>{
+            if(!this.currentProject){
+                modal.mensaje(`No project selected`);
+                return;
+            }
             this.gitPull();
         })
 
@@ -85,7 +89,7 @@ class MainScript{
             let tbody = "";
             for(let px of this.projects){
                 let status = `<span class='badge badge-${px.pm2_env.status == "online" ? "success" : "danger"}'>${ px.pm2_env.status }</span>`;
-                tbody += `<tr projectName="${px.name}">
+                tbody += `<tr class="cp" projectName="${px.name}">
                     <td>${px.name}</td>
                     <td class='text-right'>${px.monit.cpu}%</td>
                     <td class='text-right'>${parseInt(px.monit.memory / 1024 / 1024)}mb</td>
@@ -97,7 +101,7 @@ class MainScript{
             $("[name='project-list'] tbody tr").click(ev=>{
                 let row =$(ev.currentTarget);
                 let projectName = row.attr("projectName");
-                
+                this.selectProject(projectName);
             });
 
             //logueado
@@ -117,6 +121,7 @@ class MainScript{
         $("[name='err-log']").addClass("d-none").val("");
         $("[name='out-log']").addClass("d-none").val("");
         $("[name='env-table']").addClass("d-none").find("tbody").html("");
+        $("[name='btn-status']").html("Status: ?")
     }
     selectProject(projectName){
         this.clearProject();

@@ -148,6 +148,7 @@ class MainScript{
         $("[name='out-log']").addClass("d-none").val("");
         $("[name='env-table']").addClass("d-none").find("tbody").html("");
         $("[name='btn-status']").html("Status: ?")
+        this.showElement(null);
     }
     selectProject(projectName){
         this.clearProject();
@@ -214,12 +215,13 @@ class MainScript{
         this.currentProject.logs = ret;
     }
     showNginxFile(){
-        $("[name='nginx-file']").val(this.currentProject.nginx);
+        $("[name='nginx-file']").val(this.currentProject?.nginx || `/etc/nginx/sites-available/${this.currentProject.name} not founded`);
         this.showElement("nginx-file");
     }
     showEnv(){
         $("[name='table-env'] tbody").html("");     
         let tbody = this.currentProject.env.reduce((acc, item)=>{
+            if(item.prop.trim() == "") return acc;
             acc += `<tr>
             <td>${item.prop}</td>
             <td>${item.val}</td>
@@ -230,12 +232,13 @@ class MainScript{
         $("[name='table-env'] tbody").html(tbody);
         this.showElement("table-env");
     }
-    showElement(name){
+    showElement(name = null){
         $("[name='nginx-file']").addClass("d-none");
         $("[name='err-log']").addClass("d-none");
         $("[name='out-log']").addClass("d-none");
         $("[name='env-table']").addClass("d-none");
 
+        if(!name) return;
         $("[name='" + name + "']").removeClass("d-none");
     }
 }

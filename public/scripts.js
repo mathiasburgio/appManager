@@ -61,6 +61,17 @@ class MainScript{
             }
             this.showEnv();
         })
+        $("[name='flush-logs'").click(ev=>{
+            if(!this.currentProject){
+                modal.mensaje(`No project selected`);
+                return;
+            }
+            if(this.currentProject.name == "appManager"){
+                modal.mensaje("To make changes to appManager, you must do so from the terminal/console.")
+                return;
+            }
+            this.flushLogs();
+        })
 
         modal.async_esperando("validating...").then(ret=>{
             $.get({url: "/user/is-logged"}).then(ret=>{
@@ -195,15 +206,15 @@ class MainScript{
         }, 3000);
     } 
     async flushLogs(){
-        let resp = await modal.pregunta(`Confirm flush logs on ${this.currentProject.name}`);
+        let resp = await modal.pregunta(`Confirm <b>flush logs</b> on <b>${this.currentProject.name}</b>?`);
         if(!resp) return;
-        await modal.async_esperando(`Cleaning logs...`);
+        await modal.async_esperando(`Clearing logs...`);
         let ret = await $.post({
             url: "/general/flush-logs",
             data:{ projectName: this.currentProject.name}
         })
         console.log(ret);
-        $("[name='logs']").val("Nothing to see here...");
+        $("[name='log-viewer'] textarea").val("Nothing to see here...");
         modal.ocultar();
     } 
     async getLogs(err=false){
@@ -215,7 +226,7 @@ class MainScript{
         this.currentProject.logs = ret;
     }
     showNginxFile(){
-        $("[name='nginx-file']").val(this.currentProject?.nginx || `/etc/nginx/sites-available/${this.currentProject.name} not founded`);
+        $("[name='nginx-file'] textarea").val(this.currentProject?.nginx || `/etc/nginx/sites-available/${this.currentProject.name} not founded`);
         this.showElement("nginx-file");
     }
     showEnv(){
@@ -234,8 +245,7 @@ class MainScript{
     }
     showElement(name = null){
         $("[name='nginx-file']").addClass("d-none");
-        $("[name='err-log']").addClass("d-none");
-        $("[name='out-log']").addClass("d-none");
+        $("[name='log-viewer']").addClass("d-none");
         $("[name='env-table']").addClass("d-none");
 
         if(!name) return;

@@ -21,7 +21,7 @@ class MainScript{
             this.logout();
         })
 
-        $("['change-status']").click(ev=>{
+        $("[change-status]").click(ev=>{
             let newStatus = $(ev.currentTarget).attr("change-status");
             if(!this.currentProject){
                 modal.mensaje("No project selected");

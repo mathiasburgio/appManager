@@ -21,6 +21,19 @@ class MainScript{
             this.logout();
         })
 
+        $("[name='change-status']").click(ev=>{
+            let newStatus = $(ev.currentTarget).attr("change-status");
+            if(!this.currentProject){
+                modal.mensaje("No project selected");
+                return;
+            }
+            //if(this.currentProject.name == "appManager") return;
+            this.changeStatus(newStatus);
+        })
+        $("[name='git-pull']").click(ev=>{
+            this.gitPull();
+        })
+
         modal.async_esperando("validating...").then(ret=>{
             $.get({url: "/user/is-logged"}).then(ret=>{
                 if(ret?.isLogged == true){
@@ -80,13 +93,11 @@ class MainScript{
                 </tr>`;
             }
 
-            $("[name='project-list']").html(tbody);
+            $("[name='project-list'] tbody").html(tbody);
             $("[name='project-list'] tbody tr").click(ev=>{
                 let row =$(ev.currentTarget);
                 let projectName = row.attr("projectName");
-                $("[name='projects'] tbody tr").removeClass("table-info");
-                row.addClass("table-info");
-                this.currentProject = projectName;
+                
             });
 
             //logueado
@@ -97,5 +108,86 @@ class MainScript{
             console.log(err);
             alert("ERROR, check console");
         }
+    }
+    clearProject(){
+        this.currentProject = null;
+        $("[name='projects'] tbody tr").removeClass("table-info");
+        $("h3[name='project-name']").html("...");
+        $("[name='nginx-file']").addClass("d-none").val("");
+        $("[name='err-log']").addClass("d-none").val("");
+        $("[name='out-log']").addClass("d-none").val("");
+        $("[name='env-table']").addClass("d-none").find("tbody").html("");
+    }
+    selectProject(projectName){
+        this.clearProject();
+        $("[name='project-list'] [projectName='" + projectName + "']").addClass("table-info");
+        this.currentProject = this.projects.find(p=>p.name == projectName);
+        $("h3[name='project-name']").html(projectName);
+
+        let btnStatusText = `Status: <span class='badge badge-${(this.project.pm2_env.status == "online" ? "success" : "danger")}'>${this.project.pm2_env.status}</span>`;
+        $("[name='btn-status']").html(btnStatusText)
+    }
+    async changeStatus(projectName, newStatus){
+        await modal.async_esperando("Updating...");
+        let resp = await $.post({
+            url: "/general/change-status",
+            data: {
+                newStatus: newStatus, 
+                projectName: projectName
+            }
+        })
+        console.log(resp);
+        
+        $(".modal-body").html("Listing projects...");
+        await this.listProjects()
+        selectProject(projectName);
+        modal.ocultar();
+    }
+    async gitPull(){
+        let resp = await modal.pregunta(`Confirm git pull on ${this.currentProject.name}`);
+        if(!resp) return;
+        await modal.async_esperando(`Making git pull and waiting 3 seconds...`);
+        let ret = await $.post({
+            url: "/general/git-pull",
+            data:{ projectName: this.currentProject.name}
+        })
+        console.log(ret);
+        setTimeout(()=>{
+            modal.ocultar(()=>{
+                modal.mensaje(ret);
+            })
+        }, 3000);
+    } 
+    async flushLogs(){
+        let resp = await modal.pregunta(`Confirm flush logs on ${this.currentProject.name}`);
+        if(!resp) return;
+        await modal.async_esperando(`Cleaning logs...`);
+        let ret = await $.post({
+            url: "/general/flush-logs",
+            data:{ projectName: this.currentProject.name}
+        })
+        console.log(ret);
+        $("[name='logs']").val("Nothing to see here...");
+        modal.ocultar();
+    } 
+    async getLogs(err=false){
+        let ret = await $.post({
+            url: "/general/flush-logs",
+            data:{ projectName: this.currentProject.name}
+        })
+        console.log(ret);
+        this.currentProject.logs = ret;
+    }
+    async getNginxFile(){
+        $("[name='nginx-file']").val(this.currentProject.nginx);
+        this.showElement("nginx-file");
+    }
+    showElement(name){
+        $("[name='nginx-file']").addClass("d-none");
+        $("[name='err-log']").addClass("d-none");
+        $("[name='out-log']").addClass("d-none");
+        $("[name='env-table']").addClass("d-none");
+
+        $("[name='" + name + "']").removeClass("d-none");
     }
 }

@@ -138,7 +138,7 @@ class MainScript{
             url: "/general/change-status",
             data: {
                 newStatus: newStatus, 
-                projectName: projectName
+                projectName: this.currentProject.name
             }
         })
         console.log(resp);

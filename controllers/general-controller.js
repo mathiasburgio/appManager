@@ -55,13 +55,20 @@ async function _changeStatus(newStatus, projectName){
 }
 async function _projectsList(){
     try{
+        let auxAppDomains = {};
+        let appDomains = process.env.APP_NGINX_ASSOCIATION.split("&");
+        for(let ad of appDomains){
+            let [app, domain] = ad.split(":");
+            auxAppDomains[app.trim()] = domain.trim();
+        }
+
         let resp = await utils.exec(`pm2 jlist`);
         resp = JSON.parse(resp);
         //let files = fs.readdirSync(path.join(__dirname, "projects"));
         for(let proj of resp){
             //let projectPath = path.join(process.env.WWW_PATH, proj.name);
             let envPath = path.join(process.env.WWW_PATH, proj.name, ".env");
-            let nginxPath = path.join(`/etc/nginx/sites-available/${proj.name}`);
+            let nginxPath = path.join(`/etc/nginx/sites-available/${auxAppDomains?.[proj.name] || proj.name}`);
             proj.env = _envDecoder(envPath);
             if(fs.existsSync(nginxPath)) proj.nginx = fs.readFileSync(nginxPath, "utf-8");
         }

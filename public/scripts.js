@@ -219,18 +219,18 @@ class MainScript{
         this.showElement("nginx-file");
     }
     showEnv(){
-        $("[name='table-env'] tbody").html("");     
+        $("[name='env-table'] tbody").html("");     
         let tbody = this.currentProject.env.reduce((acc, item)=>{
             if(item.prop.trim() == "") return acc;
             acc += `<tr>
             <td>${item.prop}</td>
             <td>${item.val}</td>
-            <td>${item.comment}</td>
+            <td>${item.comment || ""}</td>
             </tr>`;
             return acc;
         }, "");
-        $("[name='table-env'] tbody").html(tbody);
-        this.showElement("table-env");
+        $("[name='env-table'] tbody").html(tbody);
+        this.showElement("env-table");
     }
     showElement(name = null){
         $("[name='nginx-file']").addClass("d-none");

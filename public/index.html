@@ -95,26 +95,26 @@
             <div class="card-body">
                 <h3 class="text-center mb-3" name="project-name"></h3>
                 <div>
-                    <button class="btn btn-primary mr-2" name="git-pull" style="width: 150px;"><i class="fas fa-volt"></i> Git pull</button>
-                    <button class="btn btn-light mr-2" change-status="stop" style="width: 150px;"><i class="fas fa-stop text-danger"></i> Stop</button>
-                    <button class="btn btn-light mr-2" change-status="restart" style="width: 150px;"><i class="fas fa-refresh text-warning"></i> Restart</button>
-                    <button class="btn btn-light mr-2" change-status="start" style="width: 150px;"><i class="fas fa-play text-success"></i> Start</button>
-                    <button class="btn btn-light mr-2" name="btn-status" disabled style="width: 150px;">Status: ?</button>
+                    <button class="btn btn-flat btn-primary mr-2" name="git-pull" style="width: 150px;"><i class="fas fa-volt"></i> Git pull</button>
+                    <button class="btn btn-flat btn-light mr-2" change-status="stop" style="width: 150px;"><i class="fas fa-stop text-danger"></i> Stop</button>
+                    <button class="btn btn-flat btn-light mr-2" change-status="restart" style="width: 150px;"><i class="fas fa-refresh text-warning"></i> Restart</button>
+                    <button class="btn btn-flat btn-light mr-2" change-status="start" style="width: 150px;"><i class="fas fa-play text-success"></i> Start</button>
+                    <button class="btn btn-flat btn-light mr-2" name="btn-status" disabled style="width: 150px;">Status: ?</button>
                 </div>
 
                 <div class="mt-3">
-                    <button class="btn btn-light mr-2" name="show-nginx-file" style="width: 150px;">Nginx file</button>
-                    <button class="btn btn-light mr-2" name="show-env" style="width: 150px;">.env</button>
-                    <button class="btn btn-light mr-2" style="width: 150px;">Out log</button>
-                    <button class="btn btn-light mr-2" style="width: 150px;">Error log</button>
-                    <button class="btn btn-warning mr-2" style="width: 150px;">Flush log</button>
+                    <button class="btn btn-flat btn-light mr-2" name="show-nginx-file" style="width: 150px;">Nginx file</button>
+                    <button class="btn btn-flat btn-light mr-2" name="show-env" style="width: 150px;">.env</button>
+                    <button class="btn btn-flat btn-light mr-2" style="width: 150px;">Out log</button>
+                    <button class="btn btn-flat btn-light mr-2" style="width: 150px;">Error log</button>
+                    <button class="btn btn-flat btn-warning mr-2" style="width: 150px;">Flush log</button>
                 </div>
                 
                 <div class="mt-3">
-                    <textarea class="form-control d-none" name="nginx-file" disabled></textarea>
-                    <textarea class="form-control d-none" name="err-log" disabled></textarea>
-                    <textarea class="form-control d-none" name="out-log" disabled></textarea>
-                    <div class="border d-none" name="table-env">
+                    <textarea class="form-control d-none" style="min-height: 400px;" name="nginx-file" disabled></textarea>
+                    <textarea class="form-control d-none" style="min-height: 400px;" name="err-log" disabled></textarea>
+                    <textarea class="form-control d-none" style="min-height: 400px;" name="out-log" disabled></textarea>
+                    <div class="border d-none" name="env-table">
                         <table class="table table-sm mb-0">
                             <thead class="thead-dark">
                                 <tr>

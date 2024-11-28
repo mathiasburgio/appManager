@@ -18,7 +18,7 @@ npm install
 cp .env_example .env
 nano .env
 
-4-[root] configurar nginx
+4-[root] configurar nginx (aquí podemos utilizar el mismo nombre de la app ó el dominio completo. En este último caso debe realizarse la asociacion app:dominio en el archivo .env de appManager)
 sudo nano /etc/nginx/sites-available/{dominio}
 sudo ln -s /etc/nginx/sites-available/{dominio} /etc/nginx/sites-enabled/
 nginx -t

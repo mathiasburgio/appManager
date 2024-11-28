@@ -21,18 +21,6 @@ class MainScript{
             this.logout();
         })
 
-        $("[name='new-project']").click(ev=>{
-            this.newProject();
-        })
-
-        this.nginxEditor = CodeMirror.fromTextArea(document.querySelector('#nginx [name="code-editor"]'), {
-            lineNumbers: true,
-            mode: "javascript", // Puedes cambiar el lenguaje
-            theme: "default",   // Cambia el tema si lo deseas
-            tabSize: 2
-        });
-        //nginxEditor.setValue() || nginxEditor.getValue
-
         modal.async_esperando("validating...").then(ret=>{
             $.get({url: "/user/is-logged"}).then(ret=>{
                 if(ret?.isLogged == true){

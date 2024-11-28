@@ -133,6 +133,9 @@ class MainScript{
         $("[name='btn-status']").html(btnStatusText)
     }
     async changeStatus(newStatus){
+        let askResponse = await modal.pregunta(`Confirm execute ${newStatus} on ${this.currentProject.name}?`);
+        if(!askResponse) return;
+
         await modal.async_esperando("Updating...");
         let resp = await $.post({
             url: "/general/change-status",
@@ -160,7 +163,7 @@ class MainScript{
         console.log(ret);
         setTimeout(()=>{
             modal.ocultar(()=>{
-                modal.mensaje(`<textarea class='form-control' style='min-height:400px'>${ret}</textarea>`);
+                modal.mensaje(`<b>Response</b><textarea class='form-control' readonly style='min-height:400px'>${ret}</textarea>`);
             })
         }, 3000);
     } 

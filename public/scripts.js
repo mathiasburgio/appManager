@@ -240,6 +240,8 @@ class MainScript{
         let content = this.projectLogs[this.currentProject.name][err ? "err" : "out"];
         $("[name='log-viewer'] textarea").val(content);
         this.showElement("log-viewer");
+        $("[name='log-viewer'] b:eq(0)").html(`log viewer (${err ? "err" : "out"}`);
+        $("[name='log-viewer'] textarea").scrollTop(Number.MAX_SAFE_INTEGER);
     }
     showNginxFile(){
         $("[name='nginx-file'] textarea").val(this.currentProject?.nginx || `/etc/nginx/sites-available/${this.currentProject.name} not founded`);

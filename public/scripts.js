@@ -86,7 +86,8 @@ class MainScript{
     }
     async listProjects(){
         try{
-            this.currentProject = null;
+            this.clearProject();
+            
             let resp = await $.get({
                 url: "/general/projects-list"
             });
@@ -160,7 +161,7 @@ class MainScript{
         modal.ocultar();
     }
     async gitPull(){
-        let resp = await modal.pregunta(`Confirm git pull on ${this.currentProject.name}?`);
+        let resp = await modal.pregunta(`Confirm <b>git pull</b> on <b>${this.currentProject.name}</b>?`);
         if(!resp) return;
         await modal.async_esperando(`Making git pull and waiting 3 seconds...`);
         let ret = await $.post({

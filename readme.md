@@ -32,12 +32,49 @@ Before configuring **appManager**, ensure you have the following installed and w
    git clone https://github.com/mathiasburgio/appManager
    ```
 
-2. **[appUser] Copy `.env_example` and edit it**  
+2. **[appUser] Install dependencies**  
 ```bash
    cd /var/www/appManager
    npm install
 ```
 
+3. **[appUser] Copy `.env_example` and edit it**  
+```bash
+   cp .env_example .env
+   nano .env
+```
+
+4. **[root] Configure NGINX using the provided example file**  
+```bash
+    # Copy the example configuration file
+    sudo cp /var/www/appManager/nginx-example-file /etc/nginx/sites-available/appManager
+
+    # Edit the configuration file (modify domain/URL and port [default is 9500 for appManager])
+    sudo nano /etc/nginx/sites-available/appManager
+
+    # Create a symbolic link
+    sudo ln -s /etc/nginx/sites-available/appManager /etc/nginx/sites-enabled/
+
+    # Verify NGINX configuration
+    nginx -t
+
+    # Restart NGINX
+    sudo systemctl restart nginx
+
+```
+
+5. **[appUser] Start the application**  
+```bash
+    pm2 start /var/www/appManager/main.js --name appManager
+    pm2 save
+```
+
+6. **[browser] Access and configure the user**  
+```bash
+    #Open the application in your browser.
+    #Use the email configured in the appManager/.env file.
+    #On the first login, the password will be saved in the appManager/.password file.
+```
 
 
 

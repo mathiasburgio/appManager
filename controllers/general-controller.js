@@ -80,7 +80,7 @@ async function projectsList(req, res){
             let envPath = path.join(process.env.WWW_PATH, proj.name, ".env");
             let nginxPath = path.join(`/etc/nginx/sites-available/${proj.name}`);
             proj.env = _envDecoder(envPath);
-            if(fs.existsSync(nginxPath)) proj.nginx = fs.readFileSync(nginxPath);
+            if(fs.existsSync(nginxPath)) proj.nginx = fs.readFileSync(nginxPath, "utf-8");
         }
         res.json(resp);
     }catch(err){
@@ -92,6 +92,7 @@ async function flushLogs(req, res){
     try{
         let {projectName} = req.body;
         let resp = await utils.exec(`pm2 flush ${projectName}`);
+        res.end("ok");
     }catch(err){
         res.json({error: err});
     }
@@ -99,12 +100,14 @@ async function flushLogs(req, res){
 async function logs(req, res){
     try{
         let { projectName } = req.params;
+        console.log(projectName);
         let resp = {
-            err: await utils.exec(`pm2 logs ${projectName} --err --lines 1000`),
-            out: await utils.exec(`pm2 logs ${projectName} --out --lines 1000`),
+            err: await utils.exec(`pm2 logs ${projectName} --err --lines 1000 --nostream`),
+            out: await utils.exec(`pm2 logs ${projectName} --out --lines 1000 --nostream`),
         };
         res.json(resp);
     }catch(err){
+        console.log(err);
         res.json({error: err});
     }
 }

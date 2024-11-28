@@ -1,20 +1,12 @@
-TODO
-
-1-login
-2-logout
-3-crear proyecto
-4-mostrar datos de home
-5-controles nginx
-6-controles env
-7-controles pm2
-8-controles git
-9-logs
-10-acciones
+NOTA PREVIA:
+utilizar para todo 2 nombres:
+dominio lo utilizamos como nombre de archivo en nginx
+nombreApp lo utilizamos para nombre de carpeta y nombre de app en pm2
 
 0- verificar que pm2 se ejecuta como [appUser]
 ps aux | grep pm2
 
-1-[appManager][appUser] clonamos el repositorio
+1-[appUser] clonamos el repositorio
 repositorio publico -> git clone https://...git {folderName}
 repositorio privado -> git clone https://{token}:x-oauth-basic@{url}.git {folderName}
 

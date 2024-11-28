@@ -82,7 +82,7 @@ async function projectsList(req, res){
             proj.env = _envDecoder(envPath);
             if(fs.existsSync(nginxPath)) proj.nginx = fs.readFileSync(nginxPath);
         }
-        res.end("ok");
+        res.json(resp);
     }catch(err){
         console.log(err);
         res.json({error: err});

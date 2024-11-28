@@ -1,4 +1,4 @@
-const utils = require("../utils/util.js");
+const utils = require("../utils/utils.js");
 const path = require("path");
 const fs = require("fs");
 const platform = os.platform(); // 'darwin', 'win32', 'linux', etc.

@@ -231,13 +231,15 @@ class MainScript{
             data:{ projectName: this.currentProject.name}
         })
         console.log(ret);
+        this.projectLogs[this.currentProject.name].err = "";
+        this.projectLogs[this.currentProject.name].out = "";
         $("[name='log-viewer'] textarea").val("Nothing to see here...");
         modal.ocultar();
     } 
     async showLog(err=false){
         let content = this.projectLogs[this.currentProject.name][err ? "err" : "out"];
         $("[name='log-viewer'] textarea").val(content);
-        showElement("log-viewer");
+        this.showElement("log-viewer");
     }
     showNginxFile(){
         $("[name='nginx-file'] textarea").val(this.currentProject?.nginx || `/etc/nginx/sites-available/${this.currentProject.name} not founded`);

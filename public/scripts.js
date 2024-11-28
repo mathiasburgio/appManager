@@ -64,16 +64,15 @@ class MainScript{
         try{
             this.currentProject = null;
             let resp = await $.get({
-                url: "/project/get-list"
+                url: "/general/projects-list"
             });
             console.log(resp)
-            this.projects = resp.projects;
+            this.projects = resp;
     
             let tbody = "";
             for(let px of this.projects){
-
                 let status = `<span class='badge badge-${px.pm2_env.status == "online" ? "success" : "danger"}'>${ px.pm2_env.status }</span>`;
-                tbody += `<tr pm2="${px.pid}" proj="${proj ? proj.id : -1}">
+                tbody += `<tr projectName="${px.name}">
                     <td>${px.name}</td>
                     <td class='text-right'>${px.monit.cpu}%</td>
                     <td class='text-right'>${parseInt(px.monit.memory / 1024 / 1024)}mb</td>
@@ -81,26 +80,13 @@ class MainScript{
                 </tr>`;
             }
 
-            for(let proj of this.projects){
-                let px = this.pm2.find(p=>p.nmae == px.name);
-                if(!px){
-                    let status = `<span class='badge badge-warning'>no pm2</span>`;
-                    tbody += `<tr pm2="-1" proj="${proj.id}">
-                        <td>${proj.name}</td>
-                        <td class='text-right'>0%</td>
-                        <td class='text-right'>0mb</td>
-                        <td class='text-right'>${status}</td>
-                    </tr>`;
-                }
-            }
-    
-            $("[name='projects'] tbody").html(tbody);
-            $("[name='projects'] tbody tr").click(ev=>{
+            $("[name='project-list']").html(tbody);
+            $("[name='project-list'] tbody tr").click(ev=>{
                 let row =$(ev.currentTarget);
-                let idd = row.attr("idd");
+                let projectName = row.attr("projectName");
                 $("[name='projects'] tbody tr").removeClass("table-info");
                 row.addClass("table-info");
-                this.selectProject( idd );
+                this.currentProject = projectName;
             });
 
             //logueado
@@ -109,84 +95,7 @@ class MainScript{
 
         }catch(err){
             console.log(err);
-            alert("ERROR, check console")
+            alert("ERROR, check console");
         }
-    }
-    newProject(){
-        this.currentProject = null;
-        $("[name='delete-project']").prop("disabled", true);
-        $("[name='projects'] tbody tr").removeClass("table-info");
-
-        $("#tabs-headers .card-title").html("project");
-        
-        $("#tabs #home [name='name']").prop("disabled", false).val("");
-        $("#tabs #home [name='domain']").prop("disabled", false).val("");
-        $("#tabs #home [name='git-token']").prop("disabled", false).val("");
-        $("#tabs #home [name='git-url']").prop("disabled", false).val("");
-        $("#tabs #home [name='create-project']").prop("disabled", false);
-        
-        $("#home-tab").click();
-
-        $("#tabs #home [name='create-project']").click(ev=>{
-            let ele = $(ev.currentTarget);
-            
-            let data = {
-                name: $("#tabs #home [name='name']").val(),
-                domain: $("#tabs #home [name='domain']").val(),
-                gitToken: $("#tabs #home [name='git-token']").val(),
-                gitUrl: $("#tabs #home [name='git-url']").val(),
-            }
-
-            try{
-                modal.mostrar({
-                    titulo: "Procesing",
-                    cuerpo: "<div name='log'></div>",
-                    fnMostrar2: async () =>{
-                        $("#modal .modal-footer").addClass("d-none");
-                        let log = "";
-
-                        const response = await fetch('/project/create', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(data)
-                        });
-        
-                        const reader = response.body.getReader();
-                        const decoder = new TextDecoder("utf-8");
-        
-                        while (true) {
-                            const { value, done } = await reader.read();
-                            if (done) break; // Finalizar cuando el servidor cierre la conexión
-                            let content = decoder.decode(value);
-                            log += content;
-                            $("#modal [name='log']").html(log);
-                        }
-                        $("#modal .modal-footer").removeClass("d-none");
-                    },
-                    botones: "volver"
-                })
-                
-    
-                /* 
-                $("#tabs #home [name='name']").prop("disabled", true);
-                $("#tabs #home [name='domain']").prop("disabled", true);
-                this.currentProject = resp.project; */
-            }catch(err){
-                console.log(err);
-                modal.mensaje(err.toString());
-                ele.prop("disabled", false);
-            }
-        });
-    }
-    async selectProject(projectId){
-        this.currentProject = this.projects.find(p=>p.id == projectId);
-        $("#tabs-headers .card-title").html(project.name);
-        
-        let nginx = await $.get({
-            url: "/nginx/" + this.currentProject.id
-        });
-        let env = await $.get({
-            url: "/env/" + this.currentProject.id
-        });
     }
 }

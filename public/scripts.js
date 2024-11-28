@@ -160,7 +160,7 @@ class MainScript{
         console.log(ret);
         setTimeout(()=>{
             modal.ocultar(()=>{
-                modal.mensaje(ret);
+                modal.mensaje(`<textarea class='form-control' style='min-height:400px'>${ret}</textarea>`);
             })
         }, 3000);
     } 

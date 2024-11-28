@@ -46,13 +46,9 @@ function _envDecoder(envPath){
 }
 async function _changeStatus(newStatus, projectName){
     try{
-        console.log(2);
         let resp = await utils.exec(`pm2 ${newStatus} ${projectName}`);
-        console.log(3);
-        console.log("_change status: " + resp)
         return resp;
     }catch(err){
-        console.log(6);
         console.log(err);
         return null;
     }
@@ -77,9 +73,7 @@ async function _projectsList(){
 async function changeStatus(req, res){
     try{
         let {newStatus, projectName} = req.body;
-        console.log(1, {newStatus, projectName});
         let resp = await _changeStatus(newStatus, projectName);
-        console.log(10);
         res.end("ok");
     }catch(err){
         res.json({error: err});

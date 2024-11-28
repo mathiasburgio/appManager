@@ -20,7 +20,8 @@ class MainScript{
         $("[name='logout']").click(ev=>{
             this.logout();
         })
-
+        
+        //pm2 [stop|start|restart] project
         $("[change-status]").click(ev=>{
             let newStatus = $(ev.currentTarget).attr("change-status");
             if(!this.currentProject){
@@ -33,6 +34,7 @@ class MainScript{
             }
             this.changeStatus(newStatus);
         })
+
         $("[name='git-pull']").click(ev=>{
             if(!this.currentProject){
                 modal.mensaje(`No project selected`);
@@ -43,6 +45,21 @@ class MainScript{
                 return;
             }
             this.gitPull();
+        })
+
+        $("[name='show-nginx-file'").click(ev=>{
+            if(!this.currentProject){
+                modal.mensaje(`No project selected`);
+                return;
+            }
+            this.showNginxFile();
+        })
+        $("[name='show-env'").click(ev=>{
+            if(!this.currentProject){
+                modal.mensaje(`No project selected`);
+                return;
+            }
+            this.showEnv();
         })
 
         modal.async_esperando("validating...").then(ret=>{
@@ -99,6 +116,7 @@ class MainScript{
                 let status = `<span class='badge badge-${px.pm2_env.status == "online" ? "success" : "danger"}'>${ px.pm2_env.status }</span>`;
                 tbody += `<tr class="cp" projectName="${px.name}">
                     <td>${px.name}</td>
+                    <td class='text-right'>${px.pm2_env.restart_time}%</td>
                     <td class='text-right'>${px.monit.cpu}%</td>
                     <td class='text-right'>${parseInt(px.monit.memory / 1024 / 1024)}mb</td>
                     <td class='text-right'>${status}</td>
@@ -123,7 +141,7 @@ class MainScript{
     }
     clearProject(){
         this.currentProject = null;
-        $("[name='projects'] tbody tr").removeClass("table-info");
+        $("[name='project-list'] tbody tr").removeClass("table-info");
         $("h3[name='project-name']").html("...");
         $("[name='nginx-file']").addClass("d-none").val("");
         $("[name='err-log']").addClass("d-none").val("");
@@ -195,9 +213,22 @@ class MainScript{
         console.log(ret);
         this.currentProject.logs = ret;
     }
-    async getNginxFile(){
+    showNginxFile(){
         $("[name='nginx-file']").val(this.currentProject.nginx);
         this.showElement("nginx-file");
+    }
+    showEnv(){
+        $("[name='table-env'] tbody").html("");     
+        let tbody = this.currentProject.env.reduce((acc, item)=>{
+            acc += `<tr>
+            <td>${item.prop}</td>
+            <td>${item.val}</td>
+            <td>${item.comment}</td>
+            </tr>`;
+            return acc;
+        }, "");
+        $("[name='table-env'] tbody").html(tbody);
+        this.showElement("table-env");
     }
     showElement(name){
         $("[name='nginx-file']").addClass("d-none");

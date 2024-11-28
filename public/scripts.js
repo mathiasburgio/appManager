@@ -132,7 +132,7 @@ class MainScript{
         let btnStatusText = `Status: <span class='badge badge-${(this.currentProject.pm2_env.status == "online" ? "success" : "danger")}'>${this.currentProject.pm2_env.status}</span>`;
         $("[name='btn-status']").html(btnStatusText)
     }
-    async changeStatus(projectName, newStatus){
+    async changeStatus(newStatus){
         await modal.async_esperando("Updating...");
         let resp = await $.post({
             url: "/general/change-status",
@@ -142,14 +142,15 @@ class MainScript{
             }
         })
         console.log(resp);
+        let saveProjectName = this.currentProject.name;
         
         $(".modal-body").html("Listing projects...");
         await this.listProjects()
-        selectProject(projectName);
+        selectProject(saveProjectName);
         modal.ocultar();
     }
     async gitPull(){
-        let resp = await modal.pregunta(`Confirm git pull on ${this.currentProject.name}`);
+        let resp = await modal.pregunta(`Confirm git pull on ${this.currentProject.name}?`);
         if(!resp) return;
         await modal.async_esperando(`Making git pull and waiting 3 seconds...`);
         let ret = await $.post({

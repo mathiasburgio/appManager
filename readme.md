@@ -1,5 +1,8 @@
 # appManager
 
+TODO:
+- addLogger
+
 **appManager** is a tool for managing projects running on **PM2**.  
 
 ## Features
